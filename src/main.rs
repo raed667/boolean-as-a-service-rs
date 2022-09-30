@@ -1,6 +1,9 @@
 extern crate diesel;
+extern crate env_logger;
 
-use actix_web::{App, HttpServer};
+use std::{io::Result, net::Ipv4Addr};
+
+use actix_web::{middleware::Logger, App, HttpServer};
 
 #[path = "./models.rs"]
 mod models;
@@ -16,7 +19,9 @@ pub type Connection = r2d2::PooledConnection<r2d2_sqlite::SqliteConnectionManage
 mod controller;
 
 #[actix_web::main]
-async fn main() -> std::io::Result<()> {
+async fn main() -> Result<()> {
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
     #[derive(OpenApi)]
     #[openapi(
         paths(
@@ -38,11 +43,14 @@ async fn main() -> std::io::Result<()> {
     let openapi = ApiDoc::openapi();
 
     HttpServer::new(move || {
-        App::new().configure(controller::configure()).service(
-            SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
-        )
+        App::new()
+            .wrap(Logger::default())
+            .configure(controller::configure())
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
+            )
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind((Ipv4Addr::UNSPECIFIED, 8080))?
     .run()
     .await
 }

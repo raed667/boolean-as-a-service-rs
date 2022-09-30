@@ -1,0 +1,9 @@
+/target
+.DS_Store
+.dockerignore
+.editorconfig
+.env.default
+.git
+.gitignore
+.vscode
+Dockerfile
