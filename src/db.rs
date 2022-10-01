@@ -68,3 +68,17 @@ pub fn update_boolean_by_id(
         .set((value.eq(valueq), updated_at.eq(now)))
         .get_result::<BooleanModel>(conn);
 }
+
+pub fn get_total_count(conn: &mut SqliteConnection) -> i64 {
+    use self::schema::booleans::dsl::*;
+
+    let cute_cat_count: i64 = booleans
+        .filter(id.is_not("AAAA"))
+        .count()
+        .get_result(conn)
+        .expect("Error counting cute kittens");
+
+    println!("XXXXXX {}", cute_cat_count);
+
+    return cute_cat_count;
+}

@@ -4,7 +4,7 @@ use uuid::Uuid;
 mod db;
 
 use db::{
-    delete_boolean_by_id, establish_connection, get_boolean_by_id, insert_boolean,
+    delete_boolean_by_id, establish_connection, get_boolean_by_id, get_total_count, insert_boolean,
     update_boolean_by_id,
 };
 
@@ -47,4 +47,9 @@ pub fn get_boolean(id: String) -> Result<BooleanModel, diesel::result::Error> {
 pub fn delete_boolean(id: String) {
     let connection = &mut establish_connection();
     delete_boolean_by_id(connection, id);
+}
+
+pub fn get_count() -> i64 {
+    let connection = &mut establish_connection();
+    get_total_count(connection)
 }

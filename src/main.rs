@@ -33,6 +33,7 @@ async fn main() -> Result<()> {
             controller::random,
             controller::delete,
             controller::update,
+            controller::count_booleans,
         ),
         components(
            schemas(BooleanModel, CreateBoolean, UpdateBoolean)

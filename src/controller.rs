@@ -11,7 +11,10 @@ use utoipa::ToSchema;
 
 use crate::{
     models::{CreateBoolean, UpdateBoolean},
-    service::{create_boolean, create_boolean_random, delete_boolean, get_boolean, update_boolean},
+    service::{
+        create_boolean, create_boolean_random, delete_boolean, get_boolean, get_count,
+        update_boolean,
+    },
 };
 
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
@@ -21,6 +24,11 @@ pub(super) enum ErrorResponse {
     Unauthorized(String),
 }
 
+#[derive(Serialize, ToSchema)]
+struct CountResponse {
+    count: i64,
+}
+
 pub(super) fn configure() -> impl FnOnce(&mut ServiceConfig) {
     |config: &mut ServiceConfig| {
         config
@@ -28,8 +36,23 @@ pub(super) fn configure() -> impl FnOnce(&mut ServiceConfig) {
             .service(random) //
             .service(delete) //
             .service(update) //
-            .service(get_one); //
+            .service(get_one) //
+            .service(count_booleans); //
     }
+}
+
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Get a count")
+    )
+)]
+#[get("/count")]
+async fn count_booleans() -> impl Responder {
+    let count = get_count();
+
+    let response = CountResponse { count };
+
+    HttpResponse::Ok().json(response)
 }
 
 #[utoipa::path(
@@ -40,7 +63,7 @@ pub(super) fn configure() -> impl FnOnce(&mut ServiceConfig) {
         (status = 200, description = "Get a boolean", body = [BooleanModel])
     )
 )]
-#[get("/{id}")]
+#[get("/boolean/{id}")]
 async fn get_one(path: Path<String>) -> impl Responder {
     let id = path.into_inner();
 
