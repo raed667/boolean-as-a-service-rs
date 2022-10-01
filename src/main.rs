@@ -8,7 +8,10 @@ use actix_web::{middleware::Logger, App, HttpServer};
 #[path = "./models.rs"]
 mod models;
 
-use models::BooleanModel;
+#[path = "./service.rs"]
+mod service;
+
+use models::{BooleanModel, CreateBoolean, UpdateBoolean};
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -32,7 +35,7 @@ async fn main() -> Result<()> {
             controller::update,
         ),
         components(
-           schemas(BooleanModel)
+           schemas(BooleanModel, CreateBoolean, UpdateBoolean)
         ),
         tags(
             (name = "Boolean-as-a-Service", description = "Boolean management endpoints.")

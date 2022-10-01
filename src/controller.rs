@@ -3,22 +3,16 @@ use actix_web::{
     web::{Json, Path, ServiceConfig},
     HttpResponse, Responder,
 };
-use db::establish_connection;
-use db::get_boolean_by_id;
 
 use serde::Deserialize;
 use serde::Serialize;
 
 use utoipa::ToSchema;
 
-#[path = "./db.rs"]
-mod db;
-
-#[path = "./service.rs"]
-mod service;
-
-use service::CreateBoolean;
-use service::UpdateBoolean;
+use crate::{
+    models::{CreateBoolean, UpdateBoolean},
+    service::{create_boolean, create_boolean_random, delete_boolean, get_boolean, update_boolean},
+};
 
 #[derive(Serialize, Deserialize, Clone, ToSchema)]
 pub(super) enum ErrorResponse {
@@ -49,9 +43,8 @@ pub(super) fn configure() -> impl FnOnce(&mut ServiceConfig) {
 #[get("/{id}")]
 async fn get_one(path: Path<String>) -> impl Responder {
     let id = path.into_inner();
-    let connection = &mut establish_connection();
 
-    let result = get_boolean_by_id(connection, id);
+    let result = get_boolean(id);
 
     result
         .map(|boolean| HttpResponse::Ok().json(boolean))
@@ -68,7 +61,7 @@ async fn get_one(path: Path<String>) -> impl Responder {
 )]
 #[post("/create")]
 async fn create(body: Json<CreateBoolean>) -> impl Responder {
-    let boolean = service::create_boolean(body.value);
+    let boolean = create_boolean(body.value);
     HttpResponse::Created().json(boolean)
 }
 
@@ -79,7 +72,7 @@ async fn create(body: Json<CreateBoolean>) -> impl Responder {
 )]
 #[post("/random")]
 async fn random() -> impl Responder {
-    let boolean = service::create_boolean_random();
+    let boolean = create_boolean_random();
     HttpResponse::Created().json(boolean)
 }
 
@@ -94,9 +87,7 @@ async fn random() -> impl Responder {
 #[delete("/{id}")]
 async fn delete(path: Path<(String,)>) -> impl Responder {
     let id = path.into_inner().0;
-    let connection = &mut establish_connection();
-    db::delete_boolean_by_id(connection, id);
-
+    delete_boolean(id);
     HttpResponse::NoContent()
 }
 
@@ -115,7 +106,7 @@ async fn update(path: Path<String>, body: Json<UpdateBoolean>) -> impl Responder
 
     println!("path {}", id);
 
-    service::update_boolean(id, body.value)
+    update_boolean(id, body.value)
         .map(|boolean| HttpResponse::Ok().json(boolean))
         .unwrap_or_else(|_| {
             HttpResponse::NotFound().json(ErrorResponse::NotFound(format!("id not found")))

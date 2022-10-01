@@ -67,6 +67,4 @@ pub fn update_boolean_by_id(
         .filter(id.eq(idq))
         .set((value.eq(valueq), updated_at.eq(now)))
         .get_result::<BooleanModel>(conn);
-
-    //  get_boolean_by_id(conn, idq);
 }

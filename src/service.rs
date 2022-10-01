@@ -1,20 +1,14 @@
 use rand::Rng;
-use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::db::models::BooleanModel;
+mod db;
 
-use super::db::{establish_connection, insert_boolean, update_boolean_by_id};
+use db::{
+    delete_boolean_by_id, establish_connection, get_boolean_by_id, insert_boolean,
+    update_boolean_by_id,
+};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CreateBoolean {
-    pub value: bool,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct UpdateBoolean {
-    pub value: bool,
-}
+use db::models::BooleanModel;
 
 pub fn create_boolean_random() -> BooleanModel {
     let mut rng = rand::thread_rng();
@@ -42,4 +36,15 @@ pub fn update_boolean(id: String, value: bool) -> Result<BooleanModel, diesel::r
     let model = update_boolean_by_id(connection, idx, value);
 
     return model;
+}
+
+pub fn get_boolean(id: String) -> Result<BooleanModel, diesel::result::Error> {
+    let connection = &mut establish_connection();
+
+    get_boolean_by_id(connection, id)
+}
+
+pub fn delete_boolean(id: String) {
+    let connection = &mut establish_connection();
+    delete_boolean_by_id(connection, id);
 }
