@@ -1,14 +1,11 @@
 use rand::Rng;
 use uuid::Uuid;
 
-mod db;
-
-use db::{
+use crate::db::{
     delete_boolean_by_id, establish_connection, get_boolean_by_id, get_total_count, insert_boolean,
     update_boolean_by_id,
 };
-
-use db::models::BooleanModel;
+use crate::models::BooleanModel;
 
 pub fn create_boolean_random() -> BooleanModel {
     let mut rng = rand::thread_rng();

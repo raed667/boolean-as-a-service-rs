@@ -1,15 +1,11 @@
-#[path = "./models.rs"]
-pub mod models;
-
-#[path = "./schema.rs"]
-pub mod schema;
 use diesel::dsl::now;
 use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
 
-use self::schema::booleans;
-use models::BooleanModel;
+use crate::models::BooleanModel;
+use crate::schema::booleans;
+use crate::schema::booleans::dsl::*;
 
 pub fn establish_connection() -> SqliteConnection {
     dotenv().ok();
@@ -26,8 +22,15 @@ pub struct NewBoolean {
     pub value: bool,
 }
 
-pub fn insert_boolean(conn: &mut SqliteConnection, id: String, value: bool) -> BooleanModel {
-    let new_boolean = NewBoolean { id, value };
+pub fn insert_boolean(
+    conn: &mut SqliteConnection,
+    id_new: String,
+    value_new: bool,
+) -> BooleanModel {
+    let new_boolean = NewBoolean {
+        id: id_new,
+        value: value_new,
+    };
 
     let boolean = diesel::insert_into(booleans::table)
         .values(&new_boolean)
@@ -41,16 +44,12 @@ pub fn get_boolean_by_id(
     conn: &mut SqliteConnection,
     idq: String,
 ) -> Result<BooleanModel, diesel::result::Error> {
-    use self::schema::booleans::dsl::*;
-
     let result = booleans.filter(id.eq(idq)).first::<BooleanModel>(conn);
 
     return result;
 }
 
 pub fn delete_boolean_by_id(conn: &mut SqliteConnection, idq: String) {
-    use self::schema::booleans::dsl::*;
-
     diesel::delete(booleans.filter(id.eq(idq)))
         .execute(conn)
         .unwrap();
@@ -61,8 +60,6 @@ pub fn update_boolean_by_id(
     idq: String,
     valueq: bool,
 ) -> Result<BooleanModel, diesel::result::Error> {
-    use self::schema::booleans::dsl::*;
-
     return diesel::update(booleans)
         .filter(id.eq(idq))
         .set((value.eq(valueq), updated_at.eq(now)))
@@ -70,8 +67,6 @@ pub fn update_boolean_by_id(
 }
 
 pub fn get_total_count(conn: &mut SqliteConnection) -> i64 {
-    use self::schema::booleans::dsl::*;
-
     let cute_cat_count: i64 = booleans
         .filter(id.is_not("AAAA"))
         .count()

@@ -6,7 +6,6 @@ use actix_web::{
 
 use serde::Deserialize;
 use serde::Serialize;
-
 use utoipa::ToSchema;
 
 use crate::{

@@ -5,10 +5,9 @@ use std::{io::Result, net::Ipv4Addr};
 
 use actix_web::{middleware::Logger, App, HttpServer};
 
-#[path = "./models.rs"]
+mod db;
 mod models;
-
-#[path = "./service.rs"]
+mod schema;
 mod service;
 
 use models::{BooleanModel, CreateBoolean, UpdateBoolean};
