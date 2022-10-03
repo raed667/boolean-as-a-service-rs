@@ -2,6 +2,8 @@
 
 A simple REST API to learn about Rust.
 
+[![Fly Deploy](https://github.com/raed667/boolean-as-a-service-rs/actions/workflows/main.yml/badge.svg?branch=main&event=push)](https://github.com/raed667/boolean-as-a-service-rs/actions/workflows/main.yml)
+
 ## Open-API (Swagger)
 
 - A Swagger-UI link is available under: http://localhost:8080/swagger-ui/
